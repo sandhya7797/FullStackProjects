@@ -9,9 +9,9 @@ public class Employee {
     private long id;
     private String name;
     private String email;
+    private String contact;
     @Enumerated(EnumType.STRING)
     private Department department;
-    private String contact;
 
     public long getId() {
         return id;

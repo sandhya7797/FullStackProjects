@@ -1,8 +1,8 @@
 Tech Stack -
 
 Backend -
-Java - Application Logic implemented using Java Programming Language.
-Spring Boot - Provides robust and scalable framework for building backend services.
+Java - Application Logic implemented using Java Programming Language (Java 17).
+Spring Boot - Provides robust and scalable framework for building backend services (Spring Boot 3).
 Spring Data JPA - Simplifies data access and persistence.
 Restful APIs - Exposes endpoints for communication with frontend.
 
@@ -23,6 +23,9 @@ Features:
 2. Read Employee: Provides a user-friendly interface to view a list of all employees. Detailed employee profiles display information such as name, email, contact details, and department.
 3. Update Employee: Enables users to modify existing employee details. Editable fields include name, email, contact information, and department. Changes are reflected in real-time.
 4. Delete Employee: Users can delete employee records when necessary.
+
+
+Frontend Repo  Link - Main/ReactJs/EMS/emp-app
 
 
 
