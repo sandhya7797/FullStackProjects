@@ -3,7 +3,7 @@ name: Deploy Backend
 on:
   push:
     paths:
-      - 'FullStackProjects/src/main/java/com/project/EMS/**'            # Adjust path if needed
+      - 'FullStackProjects/src/main/java/com/project/EMS/emp-app/src/**'            # Adjust path if needed
       - '.github/workflows/deploy-backend.yml'
     branches:
       - main
