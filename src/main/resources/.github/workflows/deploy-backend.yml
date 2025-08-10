@@ -1,32 +1,102 @@
-name: Deploy Backend
+name: Deploy EmpApp (Frontend + Backend)
 
 on:
   push:
+    # Trigger this workflow only on pushes to 'main' branch
+    # when files inside frontend or backend directories or this workflow file itself change
     paths:
-      - 'FullStackProjects/src/main/java/com/project/EMS/emp-app/src/**'            # Adjust path if needed
-      - '.github/workflows/deploy-backend.yml'
+      - 'frontend-dev/Main/ReactJs/EMS/emp-app/**'            # Frontend source code
+      - 'FullStackProjects/src/main/java/com/project/EMS/emp-app/**'  # Backend source code
+      - '.github/workflows/deploy-app.yml'                    # Workflow config file
     branches:
       - main
 
 jobs:
-  deploy-backend:
+  # ---------------- Frontend Job ----------------
+  build-and-deploy-frontend:
+    name: Build & Deploy Frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Set working directory to frontend app folder for all run steps here
+        working-directory: frontend-dev/Main/ReactJs/EMS/emp-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # Clones the repo so the workflow can access the frontend code
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'   # Use Node.js 18 for building frontend
+
+      - name: Install dependencies
+        run: npm install    # Installs all npm packages needed for the frontend
+
+      - name: Build app
+        run: npm run build  # Builds the React frontend into static files (usually into 'build' folder)
+
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --delete       # Sync files to S3 bucket and delete removed files in bucket
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}        # Target S3 bucket name (from GitHub Secrets)
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS Access Key (from Secrets)
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS Secret Key (from Secrets)
+          SOURCE_DIR: build    # Upload the built frontend files (build directory)
+
+  # ---------------- Backend Job ----------------
+  deploy-backend:
+    name: Build & Deploy Backend
+    runs-on: ubuntu-latest
+    needs: build-and-deploy-frontend   # Run backend job only after frontend completes successfully
+
+    defaults:
+      run:
+        # Set working directory to backend source root folder
+        working-directory: FullStackProjects
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        # Clone the repo again (fresh environment) to access backend code
 
-      - name: Configure AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-1   # Change to your region
+          distribution: 'temurin'   # Use Eclipse Temurin JDK distribution
+          java-version: '17'        # Use Java 17
 
-      - name: Download latest backend JAR from S3
-        run: |
-          aws s3 cp s3://myjarbucketsandhya/EMS-0.0.1-SNAPSHOT.jar ./backend-latest.jar
+      - name: Set up Maven
+        uses: s4u/setup-maven-action@v1
+        with:
+          maven-version: '3.9.6'    # Install Maven 3.9.6 to build the backend
 
-      - name: Run backend JAR
-        run: |
-          java -jar backend-latest.jar
+      - name: Build backend JAR
+        run: mvn clean package
+        # Run Maven clean and package goals to build the backend JAR file
+
+      - name: Copy backend JAR to EC2
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}        # EC2 instance hostname/IP from secrets
+          username: ${{ secrets.EC2_USER }}    # EC2 SSH user from secrets (e.g., ec2-user)
+          key: ${{ secrets.EC2_SSH_KEY }}      # Private SSH key (from secrets)
+          source: target/EMS-0.0.1-SNAPSHOT.jar  # JAR file path relative to working-directory
+          target: /home/${{ secrets.EC2_USER }}/backend-latest.jar
+          # Copy JAR to EC2 home directory, rename it as backend-latest.jar
+
+      - name: Restart backend app on EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            pkill -f backend-latest.jar || true  # Kill existing backend app if running, ignore error if none
+            chmod +x /home/${{ secrets.EC2_USER }}/backend-latest.jar  # Make sure JAR is executable (optional)
+            nohup java -jar /home/${{ secrets.EC2_USER }}/backend-latest.jar > backend.log 2>&1 &  
+            # Run backend JAR in background, redirect output to backend.log (runs detached)
+
