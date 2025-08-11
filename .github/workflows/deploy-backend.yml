@@ -7,7 +7,7 @@ on:
     paths:
       - 'frontend-dev/Main/ReactJs/EMS/emp-app/**'            # Frontend source code
       - 'FullStackProjects/src/main/java/com/project/EMS/emp-app/**'  # Backend source code
-      - '.github/workflows/deploy-app.yml'                    # Workflow config file
+      - '../workflows/deploy-app.yml'                    # Workflow config file
     branches:
       - main
 
