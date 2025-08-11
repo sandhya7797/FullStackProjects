@@ -1,12 +1,12 @@
-name: hello-world
-'on': push
+name: hello-world1
+on: 
+  push:
 jobs:
   my-job:
     runs-on: ubuntu-latest
     steps:
       - name: my-step
         run: echo "Hello World!"
-
 
 # name: Deploy EmpApp (Frontend + Backend)
 
