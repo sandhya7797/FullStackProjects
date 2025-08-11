@@ -6,7 +6,7 @@ on:
     # when files inside frontend or backend directories or this workflow file itself change
     paths:
       - 'frontend-dev/Main/ReactJs/EMS/emp-app/**'            # Frontend source code
-      - 'FullStackProjects/src/main/java/com/project/EMS/emp-app/**'  # Backend source code
+      - 'FullStackProjects/**'  # Backend source code
       - '../workflows/deploy-app.yml'                    # Workflow config file
     branches:
       - main
