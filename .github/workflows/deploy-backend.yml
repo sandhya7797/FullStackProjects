@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK and Maven
+      - name: Set up JDK Maven
         uses: actions/setup-java@v3
         with:
           java-version: '17'
