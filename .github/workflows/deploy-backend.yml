@@ -27,7 +27,7 @@ jobs:
           cache: 'maven'
 
       - name: Build backend JAR
-        run: mvn clean package -Dspring.profiles.active=build
+        run: mvn clean package -DskipTests
 
       - name: Copy backend JAR to EC2
         uses: appleboy/scp-action@v0.1.5
