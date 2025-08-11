@@ -33,4 +33,4 @@ jobs:
           target: /home/${{ secrets.EC2_USER }}/backend-latest.jar
           script: |
             pkill -f backend-latest.jar || true
-            chmod +x /home/${{ secrets.EC2_USER }}/backend-latest.jar
+            chmod +x /home/${{ secrets.EC2_USER }}/backend-latest.jar/target/EMS-0.0.1-SNAPSHOT.jar
