@@ -30,7 +30,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: target/EMS-0.0.1-SNAPSHOT.jar
-          target: /home/${{ secrets.EC2_USER }}/backend-latest.jar
+          target: /home/${{ secrets.EC2_USER }}
           script: |
-            pkill -f backend-latest.jar || true
-            chmod +x /home/${{ secrets.EC2_USER }}/backend-latest.jar/target/EMS-0.0.1-SNAPSHOT.jar
+            pkill -f EMS-0.0.1-SNAPSHOT.jar || true
+            chmod +x /home/${{ secrets.EC2_USER }}/EMS-0.0.1-SNAPSHOT.jar
