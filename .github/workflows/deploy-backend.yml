@@ -1,4 +1,4 @@
-name: Deploy emp-app backend
+name: Deploy empapp backend
 
 on:
   push:
