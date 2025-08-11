@@ -29,7 +29,7 @@ jobs:
       - name: Build backend JAR
         run: mvn clean package -DskipTests
 
-      - name: Copy backend JAR to EC2
+      - name: Copy backend JAR to EC2 and give permissions
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -37,14 +37,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: target/EMS-0.0.1-SNAPSHOT.jar
           target: /home/${{ secrets.EC2_USER }}/backend-latest.jar
-
-      - name: Restart backend app on EC2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             pkill -f backend-latest.jar || true
             chmod +x /home/${{ secrets.EC2_USER }}/backend-latest.jar
-            nohup java -jar /home/${{ secrets.EC2_USER }}/backend-latest.jar > backend.log 2>&1 &
