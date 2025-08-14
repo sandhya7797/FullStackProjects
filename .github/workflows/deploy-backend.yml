@@ -1,36 +1,36 @@
-name: Deploy emp-app backend
+# name: Deploy emp-app backend
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up JDK Maven
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
+#       - name: Set up JDK Maven
+#         uses: actions/setup-java@v3
+#         with:
+#           java-version: '17'
+#           distribution: 'temurin'
+#           cache: 'maven'
 
-      - name: Build Backend JAR
-        run: mvn clean package -DskipTests
+#       - name: Build Backend JAR
+#         run: mvn clean package -DskipTests
 
-      - name: Copy backend JAR to EC2 and give permissions
-        uses: appleboy/scp-action@v0.1.5
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: target/EMS-0.0.1-SNAPSHOT.jar
-          target: /home/${{ secrets.EC2_USER }}
-          script: |
-            pkill -f EMS-0.0.1-SNAPSHOT.jar || true
-            chmod +x /home/${{ secrets.EC2_USER }}/target/EMS-0.0.1-SNAPSHOT.jar
+#       - name: Copy backend JAR to EC2 and give permissions
+#         uses: appleboy/scp-action@v0.1.5
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ${{ secrets.EC2_USER }}
+#           key: ${{ secrets.EC2_SSH_KEY }}
+#           source: target/EMS-0.0.1-SNAPSHOT.jar
+#           target: /home/${{ secrets.EC2_USER }}
+#           script: |
+#             pkill -f EMS-0.0.1-SNAPSHOT.jar || true
+#             chmod +x /home/${{ secrets.EC2_USER }}/target/EMS-0.0.1-SNAPSHOT.jar
